@@ -1,32 +1,29 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.13;
 
-contract ExampleContract {
-    address public owner;
-    uint256 public value;
-
-    constructor() {
-        owner = msg.sender;
+contract ErrorCode {
+    function Require(uint _i) public pure {
+        require(_i > 11, "Input must be greater than 11");
     }
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Caller is not the owner");
-        _;
+    function Revert(uint _i) public pure {
+
+        if (_i <= 11) {
+            revert("Input must be greater than 11");
+        }
     }
 
-    function setValue(uint256 _value) public onlyOwner {
-        require(_value > 0, "Value must be greater than zero");
-        value = _value;
+    uint public number;
+
+    function Assert() public view {
+        assert(number == 0);
     }
 
-    function assertValue(uint256 _value) public view {
-        assert(_value == value);
-    }
+    error LowBalance(uint balance, uint withdrawalAmount);
 
-    function revertIfNotOwner() public view {
-        if (msg.sender != owner) {
-            revert("Caller is not the owner");
+    function TryCustomError(uint _withdrawalAmount) public view {
+        uint balance = address(this).balance;
+        if (balance < _withdrawalAmount) {
+            revert LowBalance({balance: balance, withdrawalAmount: _withdrawalAmount});
         }
     }
 }
-
